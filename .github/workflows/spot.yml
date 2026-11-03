@@ -1,0 +1,17 @@
+name: spot
+on:
+  schedule: [{cron: '*/10 * * * *'}]
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: spot, cancel-in-progress: false}
+jobs:
+  spot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/spot.py
+      - run: |
+          if [ -n "$(git status --porcelain prices.json)" ]; then
+            git config user.name spot-bot; git config user.email spot-bot@users.noreply.github.com
+            git add prices.json; git commit -m "spot $(date -u +%FT%TZ)"; git pull --rebase -q; git push
+          fi
