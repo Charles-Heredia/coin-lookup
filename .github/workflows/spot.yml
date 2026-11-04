@@ -13,5 +13,5 @@ jobs:
       - run: |
           if [ -n "$(git status --porcelain prices.json)" ]; then
             git config user.name spot-bot; git config user.email spot-bot@users.noreply.github.com
-            git add prices.json; git commit -m "spot $(date -u +%FT%TZ)"; git pull --rebase -q; git push
+            git add prices.json; git commit -m "spot $(date -u +%FT%TZ)"; for i in 1 2 3 4 5; do git pull --rebase -q && git push && exit 0; sleep $((i*10)); done; echo "push failed after retries"; exit 0
           fi
