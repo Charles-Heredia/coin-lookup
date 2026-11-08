@@ -88,8 +88,19 @@ assert(N.spotStatus(now, now - 90 * 60000, true).stale === true && N.spotStatus(
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const sw = readFileSync(new URL("../sw.js", import.meta.url), "utf8");
-assert(html.includes('Ha="v56"') && !html.includes('Ha="v55"'), "app version");
-assert(sw.includes("coin-lookup-v56") && sw.includes("nugget.js"), "service worker");
+const sterling = N.compute({ metal: "silver", gramsText: "1", purityText: "92.5", purityMode: "percent", spot: 40, now: 0, spotUpdatedMs: 1, spotOk: true });
+const pureSilver = N.compute({ metal: "silver", gramsText: "1", purityText: "100", purityMode: "percent", spot: 40, now: 0, spotUpdatedMs: 1, spotOk: true });
+near(sterling.purityPercent, 92.5);
+near(sterling.fineGrams, 0.925);
+near(sterling.melt, pureSilver.melt * 0.925);
+assert(sterling.melt !== pureSilver.melt);
+const ui = readFileSync(new URL("../nugget-ui.js", import.meta.url), "utf8");
+const silverPresets = ui.indexOf(': [{ mode: "percent", value: "50"');
+assert(silverPresets > 0 && ui.slice(silverPresets).includes('value: "92.5", label: "Sterling (.925)"'), "sterling preset");
+assert(!ui.slice(0, silverPresets).includes("Sterling"), "sterling must stay off the gold preset list");
+
+assert(html.includes('Ha="v57"') && !html.includes('Ha="v56"'), "app version");
+assert(sw.includes("coin-lookup-v57") && !sw.includes("coin-lookup-v56") && sw.includes("nugget.js"), "service worker");
 assert(html.includes("Raw nuggets"), "learning entry");
 assert(html.includes("NuggetSection"), "calculator mounted");
 assert(!html.includes("My Collection") || html.indexOf("nugget-calc") === -1 || true);
