@@ -1,0 +1,20 @@
+import { readFileSync } from "fs";
+
+const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const sw = readFileSync(new URL("../sw.js", import.meta.url), "utf8");
+const rows = '[["1 g",1],["1/20 oz",1.555175],["1/10 oz",3.11035],["1/4 oz",7.775875],["10 g",10],["1 oz",31.1035],["100 g",100],["1 kg",1e3]]';
+if (!html.includes(rows)) throw new Error("melt rows missing or reordered");
+if (html.split('["1/20 oz",1.555175]').length !== 2) throw new Error("1/20 oz row count");
+const grams = 1.555175;
+const oz = grams / 31.1035;
+if (Math.abs(oz - 0.05) > 1e-12) throw new Error("1/20 oz is not 0.05 troy oz: " + oz);
+const silver = 51.821;
+const gold = 4070.1;
+const ag = silver * oz;
+const au = gold * oz;
+if (Math.abs(ag - silver * 0.05) > 1e-9 || Math.abs(au - gold * 0.05) > 1e-6) throw new Error("ticker factor");
+if (!html.includes('Va="v59"') || html.includes('Va="v58"')) throw new Error("app version");
+if (!sw.includes("coin-lookup-v59") || sw.includes("coin-lookup-v58")) throw new Error("service worker");
+if (!html.includes("Sterling (.925)") && !readFileSync(new URL("../nugget-ui.js", import.meta.url), "utf8").includes("Sterling (.925)")) throw new Error("sterling missing");
+console.log("1/20 oz melt check passed");
+console.log("example silver", ag.toFixed(2), "gold", au.toFixed(2));
