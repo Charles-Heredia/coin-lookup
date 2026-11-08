@@ -10,7 +10,7 @@ page.on("pageerror", (e) => errors.push(String(e)));
 page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
 await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true });
 await page.goto("http://127.0.0.1:8765/?t=" + Date.now(), { waitUntil: "domcontentloaded", timeout: 30000 });
-await page.waitForFunction(() => document.body.innerText.includes("v56"));
+await page.waitForFunction(() => document.body.innerText.includes("v57"));
 async function overflow(label) {
   const o = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
   if (o.scroll > o.client + 1) throw new Error(label + " overflow " + JSON.stringify(o));
@@ -61,6 +61,29 @@ const assumed = await page.evaluate(() => document.querySelector("#nugget-calc .
 if (assumed.includes("$0.00") && !/\$0\.00[1-9]|\$0\.000/.test(assumed)) throw new Error("assumed tiny shown as $0 " + assumed);
 await page.evaluate(() => document.querySelector("#nugget-calc .ngbox").scrollIntoView({ block: "center" }));
 await page.screenshot({ path: "/opt/cursor/artifacts/nugget-silver-fraction-390.png" });
+
+await page.evaluate(() => {
+  const one = [...document.querySelectorAll("#nugget-calc button")].find((b) => b.textContent.trim() === "1 g");
+  one.click();
+  [...document.querySelectorAll("#nugget-calc button")].find((b) => b.textContent.trim() === "Sterling (.925)").click();
+});
+await page.waitForFunction(() => document.querySelector("#ng-purity").value === "92.5");
+const sterling = await page.evaluate(() => {
+  const NC = window.NuggetCalc;
+  const spot = Number(document.querySelector("#nugget-calc .ngspot .ngbig").textContent.replace(/[^0-9.]/g, ""));
+  const grams = document.querySelector("#ng-grams").value;
+  const est = NC.compute({ metal: "silver", gramsText: grams, purityText: "92.5", purityMode: "percent", spot, now: 1, spotUpdatedMs: 1, spotOk: true });
+  const pure = NC.compute({ metal: "silver", gramsText: grams, purityText: "100", purityMode: "percent", spot, now: 1, spotUpdatedMs: 1, spotOk: true });
+  const shown = [...document.querySelectorAll("#nugget-calc .ngbox .ngbig")].map((el) => el.textContent.trim());
+  return { purity: document.querySelector("#ng-purity").value, grams, factor: est.melt / pure.melt, shownEst: shown.includes(NC.formatUsd(est.melt)), est: NC.formatUsd(est.melt), pure: NC.formatUsd(pure.melt) };
+});
+if (sterling.purity !== "92.5" || sterling.grams !== "1" || Math.abs(sterling.factor - 0.925) > 1e-12 || !sterling.shownEst) throw new Error("sterling factor " + JSON.stringify(sterling));
+await page.evaluate(() => [...document.querySelectorAll("#nugget-calc button")].find((b) => b.textContent.trim() === "Gold").click());
+await page.waitForFunction(() => !document.querySelector("#nugget-calc").innerText.includes("Sterling"));
+await page.evaluate(() => [...document.querySelectorAll("#nugget-calc button")].find((b) => b.textContent.trim() === "Silver").click());
+await page.waitForFunction(() => document.querySelector("#nugget-calc").innerText.includes("Sterling (.925)"));
+await page.evaluate(() => document.querySelector("#nugget-calc .ngbox").scrollIntoView({ block: "center" }));
+await page.screenshot({ path: "/opt/cursor/artifacts/nugget-sterling-390.png" });
 
 await page.evaluate(() => {
   const input = document.querySelector("#ng-grams");

@@ -66,7 +66,7 @@ window.renderNugget = function (api) {
   });
   var presets = metal === "gold"
     ? [{ mode: "percent", value: "50", label: "Assume 50%" }, { mode: "percent", value: "75", label: "Assume 75%" }, { mode: "percent", value: "90", label: "Assume 90%" }, { mode: "karat", value: "10", label: "Assume 10k" }, { mode: "karat", value: "14", label: "Assume 14k" }, { mode: "karat", value: "18", label: "Assume 18k" }, { mode: "karat", value: "22", label: "Assume 22k" }, { mode: "karat", value: "24", label: "Assume 24k" }]
-    : [{ mode: "percent", value: "50", label: "Assume 50%" }, { mode: "percent", value: "75", label: "Assume 75%" }, { mode: "percent", value: "90", label: "Assume 90%" }, { mode: "percent", value: "99.9", label: "Assume .999" }];
+    : [{ mode: "percent", value: "50", label: "Assume 50%" }, { mode: "percent", value: "75", label: "Assume 75%" }, { mode: "percent", value: "90", label: "Assume 90%" }, { mode: "percent", value: "92.5", label: "Sterling (.925)" }, { mode: "percent", value: "99.9", label: "Assume .999" }];
 
   var assumed = "Assumed purity: unknown until assay";
   if (r.purityState === "error") assumed = r.purityError;
