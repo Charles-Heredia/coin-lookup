@@ -85,5 +85,13 @@ for (const id of peaceExcluded) {
   if (src.includes(id) || html.includes(id)) throw new Error("excluded Peace listing published: " + id);
 }
 if (src.includes("American Silver Eagle") && src.includes("observed eBay sale") && /American Silver Eagle[\s\S]{0,80}n=1/.test(src)) throw new Error("invented ASE sale");
+const unzoned = /\b\d{1,2}:\d{2}\s*(?:AM|PM)\b(?!\s*(?:ET|EST|EDT|CT|CST|CDT|MT|MST|MDT|PT|PST|PDT|HST|UTC|GMT))/;
+if (unzoned.test(src) || unzoned.test(html)) throw new Error("unzoned sold clock time quoted");
+for (const date of ["Nov 7, 2026", "Nov 8, 2026"]) {
+  if (!src.includes("Sold date " + date) || !html.includes("Sold date " + date)) throw new Error("calendar sold date dropped: " + date);
+}
+for (const clock of ["4:27 PM", "1:03 PM", "7:09 PM", "8:28 AM", "4:01 PM", "2:10 PM"]) {
+  if (src.includes(clock) || html.includes(clock)) throw new Error("clock time still published: " + clock);
+}
 console.log("gold eagle size check passed");
 console.log("melts at $4000 spot:", sizes.map((s) => s[1] + " $" + (s[2] * 4000).toFixed(2)).join(", "));
