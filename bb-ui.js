@@ -1,9 +1,81 @@
 /* Branded bullion reference. Data is window.BBDATA from the Nov 6, 2026 HST check. */
+function bbNorm(s) {
+  return String(s || "").toLowerCase().replace(/×/g, "x").replace(/,/g, ".").replace(/½/g, "1/2").replace(/[^a-z0-9./]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function bbCanonicalWeight(raw) {
+  const s = bbNorm(raw);
+  const map = [
+    [/^(1\/2|0\.5|half) (g|gram|grams)$/, "0.5g"],
+    [/^1 (g|gram|grams)$/, "1g"],
+    [/^2\.5 (g|gram|grams)$/, "2.5g"],
+    [/^5 (g|gram|grams)$/, "5g"],
+    [/^10 (g|gram|grams)$/, "10g"],
+    [/^20 (g|gram|grams)$/, "20g"],
+    [/^25 (g|gram|grams)$/, "25g"],
+    [/^50 (g|gram|grams)$/, "50g"],
+    [/^100 (g|gram|grams)$/, "100g"],
+    [/^250 (g|gram|grams)$/, "250g"],
+    [/^500 (g|gram|grams)$/, "500g"],
+    [/^5000 (g|gram|grams)$/, "5000g"],
+    [/^(1\/2|0\.5|half) (oz|ounce|ounces)$/, "0.5oz"],
+    [/^1 (oz|ounce|ounces)$/, "1oz"],
+    [/^10 (oz|ounce|ounces)$/, "10oz"],
+    [/^100 (oz|ounce|ounces)$/, "100oz"],
+    [/^1 (kilo|kg|kilogram|kilograms)$/, "1kg"],
+    [/^5 (kilo|kg|kilogram|kilograms)$/, "5kg"],
+  ];
+  for (let i = 0; i < map.length; i++) if (map[i][0].test(s)) return map[i][1];
+  return "";
+}
+function bbExtractWeight(query) {
+  const phrases = ["half gram", "1/2 gram", "0.5 gram", "half g", "1/2 g", "0.5 g", "half ounce", "1/2 ounce", "0.5 ounce", "half oz", "1/2 oz", "0.5 oz", "2.5 gram", "2.5 g", "100 gram", "100 g", "100 ounce", "100 oz", "50 gram", "50 g", "25 gram", "25 g", "20 gram", "20 g", "10 gram", "10 g", "10 ounce", "10 oz", "5 kilo", "5 kg", "5 gram", "5 g", "1 kilo", "1 kg", "1 gram", "1 g", "1 ounce", "1 oz", "500 gram", "500 g", "250 gram", "250 g"];
+  let rest = bbNorm(query);
+  for (let i = 0; i < phrases.length; i++) {
+    const p = phrases[i];
+    const re = new RegExp("(^| )" + p.replace(/\./g, "\\.") + "( |$)");
+    if (re.test(rest)) return { id: bbCanonicalWeight(p), rest: rest.replace(re, " ").replace(/\s+/g, " ").trim() };
+  }
+  return { id: "", rest: rest };
+}
+function bbTagSold(data) {
+  (data.sold || []).forEach((s, i) => { if (!s.domId) s.domId = "sold-" + i; });
+}
+function bbHay(item) {
+  return bbNorm([item.maker, item.metal, item.name, item.weight, item.line, item.form].filter(Boolean).join(" "));
+}
+window.bbSearch = function (query) {
+  const data = window.BBDATA;
+  if (!data || !query) return [];
+  bbTagSold(data);
+  const found = bbExtractWeight(query);
+  const tokens = found.rest.split(" ").filter((t) => t.length >= 2);
+  if (!found.id && tokens.length === 0) return [];
+  const hits = [];
+  function add(item, view, kind) {
+    const weightId = bbCanonicalWeight(item.weight);
+    if (found.id && weightId !== found.id) return;
+    const hay = bbHay(item);
+    for (let i = 0; i < tokens.length; i++) if (hay.indexOf(tokens[i]) < 0) return;
+    const weight = item.weight && item.weight !== "—" ? item.weight : "";
+    hits.push({
+      id: item.domId || item.id,
+      view: view,
+      title: item.name || [item.line, item.maker, item.metal, weight].filter(Boolean).join(" · "),
+      meta: [item.maker, item.metal, weight, kind].filter(Boolean).join(" · "),
+    });
+  }
+  (data.lines || []).forEach((item) => add(item, "asks", "Dealer ask"));
+  (data.official || []).forEach((item) => add(item, "eur", "Manufacturer EUR list"));
+  (data.sold || []).forEach((item) => add(item, "sold", "Sold lot"));
+  return hits;
+};
 window.bbRender = function (api) {
-  const { a, W, He, D, U, ag, au, spotLabel, spotSrc } = api;
+  const { a, W, He, D, E, U, ag, au, spotLabel, spotSrc } = api;
   const data = window.BBDATA;
   if (!data) return a(W, { heading: "Branded bullion", children: "Branded bullion data did not load." });
-  const [view, setView] = D("asks");
+  bbTagSold(data);
+  const focus = window.__bbFocus || null;
+  const [view, setView] = D(focus && focus.view ? focus.view : "asks");
   const [metal, setMetal] = D("all");
   const [maker, setMaker] = D("all");
 
@@ -120,7 +192,7 @@ window.bbRender = function (api) {
     return a("p", { class: "bbnote", children: "Observed cash asks: " + money(lo) + " – " + money(hi) + " (" + asks.length + " quotes). Not a sold range and not a typical price." + (allIn ? " Each of these was in stock at the check." : " Stock is not the same on every quote.") });
   }
   function lineCard(line) {
-    return a("article", { class: "bbcard", children: kids([
+    return a("article", { class: "bbcard", id: "bb-" + line.id, children: kids([
       a("div", { class: "bbhead", children: [
         a("div", { children: [
           a("div", { class: "bbname", children: line.name }),
@@ -158,7 +230,7 @@ window.bbRender = function (api) {
     return (n < 0 ? "−" : "") + code + " " + body;
   }
   function soldCard(s) {
-    return a("article", { class: "bbcard", children: kids([
+    return a("article", { class: "bbcard", id: "bb-" + s.domId, children: kids([
       a("div", { class: "bbname", children: s.maker + (s.metal ? " " + s.metal : "") + " · " + s.weight }),
       s.line ? a("p", { class: "bbnote", children: s.line }) : null,
       s.condition ? a("p", { class: "bbnote", children: s.condition }) : null,
@@ -177,7 +249,7 @@ window.bbRender = function (api) {
     ]) });
   }
   function officialCard(o) {
-    return a("article", { class: "bbcard", children: kids([
+    return a("article", { class: "bbcard", id: "bb-" + o.id, children: kids([
       a("div", { class: "bbhead", children: [
         a("div", { children: [
           a("div", { class: "bbname", children: o.name }),
@@ -207,10 +279,21 @@ window.bbRender = function (api) {
     body = shownSold.length ? withHeads(shownSold, soldCard) : [a(He, { children: "No sold lots for that filter." })];
   }
 
+  if (E) E(() => {
+    const f = window.__bbFocus;
+    if (!f || !f.id) return;
+    const el = document.getElementById("bb-" + f.id);
+    if (el) {
+      el.scrollIntoView({ block: "start" });
+      el.style.outline = "2px solid #cda848";
+    }
+    window.__bbFocus = null;
+  }, []);
+
   return a("div", { id: "branded-bullion", children: a(W, {
     heading: "Branded bullion",
     collapsible: true,
-    defaultOpen: false,
+    defaultOpen: !!(focus && focus.id),
     caption: "Geiger, PAMP, Valcambi · dated asks, not sold prices",
     children: [
       a(He, { children: "Dealer prices are asks observed on 2026-11-06 HST (" + data.lines.reduce((n, l) => n + l.quotes.length, 0) + " quotes). They are not sold prices and may be gone. Card, crypto, and quantity tiers are not substituted for the cash single-unit figure. Shipping and tax are excluded. A blank means that value was not established." }),

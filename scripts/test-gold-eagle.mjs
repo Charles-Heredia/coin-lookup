@@ -27,9 +27,9 @@ for (const [, , oz] of sizes) {
 }
 if (!html.includes('["1/200 oz",.1555175]') || !src.includes('["1/200 oz", 0.1555175]')) throw new Error("1/200 oz row dropped");
 if (!html.includes('["1/20 oz",1.555175]') || !src.includes('["1/20 oz", 1.555175]')) throw new Error("1/20 oz row dropped");
-if (!html.includes('Va="v64"') || html.includes('Va="v63"')) throw new Error("app version");
-if (!src.includes('APP_VER = "v64"')) throw new Error("source version");
-if (!sw.includes("coin-lookup-v64") || sw.includes("coin-lookup-v63")) throw new Error("service worker");
+if (!html.includes('Va="v66"') || html.includes('Va="v65"')) throw new Error("app version");
+if (!src.includes('APP_VER = "v66"')) throw new Error("source version");
+if (!sw.includes("coin-lookup-v66") || sw.includes("coin-lookup-v65")) throw new Error("service worker");
 const sale = "https://www.ebay.com/itm/137911337774";
 if (!src.includes(sale) || !html.includes(sale)) throw new Error("sold link");
 if (!src.includes("$465.80 before tax") || !html.includes("$465.80 before tax")) throw new Error("shipping total");

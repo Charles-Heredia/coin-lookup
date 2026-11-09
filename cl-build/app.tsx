@@ -7,7 +7,7 @@ if (typeof window !== "undefined") window.addEventListener("resize", () => capSt
 export let AG = 51.83;
 export let AU = 4063.80;
 export let SPOT = "Nov 6, 2026, ~2:30 PM ET (Kitco)";
-const APP_VER = "v64";
+const APP_VER = "v66";
 /** Retail D[] scrub Nov 6, 2026: PriceCharting full-guide aggregates only. Worn column uses PC Ungraded as raw/ungraded substitute — not a specific G/VG/F. Not individual eBay sold lots. Varieties/proofs/types left unchanged without exact page match. */
 const PRICE_SCRUB_NOTE = "Weekly sold-price refresh Nov 8, 2026 HST (v62): PriceCharting full-guide values (built from completed sales) re-pulled for every US series row; a cell changed only when the grade had 3+ recent sold listings, moved 3%+, and stayed above melt for silver; thin or suspicious cells kept their prior value. ASE raw re-pulled the same way for plain bullion, proof and burnished rows. CoinGrader eBay sold data (Mexico, world bullion) has had no new sales since Jul 23, 2026, so those values are unchanged. Earlier: Price guide scrub Nov 6, 2026 (PriceCharting full-guide aggregates). Worn = PC Ungraded as raw/ungraded substitute (not a specific worn grade). AU/MS62/MS64 = PC guide. Not verified individual sold comps. Varieties/proofs unchanged without exact match. Variety auction solds (PCGS Auction Prices / Stack's / Heritage, checked Nov 6, 2026 HST): 1955 DDO AU=$2280 (Stack's AU53 Nov-2025), MS62=$2880 (Heritage MS62BN Nov-2025); MS64 left blank (MS64RD color-specific). Other varieties/ASE finishes/Mexico/Trump/PS unchanged — GC/Heritage lot pages hide hammers without login; no merchant asks used. Branded bullion asks checked 2026-11-06 HST (dealer asks, not sold prices). Raw nugget calculator uses 31.1034768 g per troy oz and does not assume purity. Sterling silver preset is 92.5%. American Gold Eagle bullion sizes are 1 oz, 1/2 oz, 1/4 oz, and 1/10 oz fine gold; face values are denominations. One observed 1/10 oz Gold Eagle eBay sale (item 137911337774, Nov 7, 2026) is labeled n=1, not a typical price. Three observed 1921 Morgan eBay sales (NGC MS62 mint unknown item 237161527950, 1921-D PCGS MS62 item 900059971544, 1921-S NGC MS64 item 800889297167) are each labeled n=1 and do not replace guide cells. Two observed 1923 Peace dollar eBay sales (PCGS MS64 mint unknown item 820256773048, NGC MS64 mint unknown item 267827516856) are each labeled n=1, are not 1923-P, and do not replace guide cells.";
 const melt = (oz: number) => "$" + (oz * AG).toFixed(2);
@@ -381,7 +381,7 @@ function CT(p0: { columns: string[]; rows: any[][]; ds?: number; sid?: string })
 }
 
 const NOTE: Record<string, [string, string]> = {
-  search: ["Search tips", "Type a coin name (libertad, panda, morgan) to see every year. Add a year (1992 kook) to get that coin's card, or type just a year (1921) to see every coin dated that year. Mint marks work too (1916-D merc)."],
+  search: ["Search tips", "Type a coin name (libertad, panda, morgan) to see every year. Add a year (1992 kook) to get that coin's card, or type just a year (1921) to see every coin dated that year. Mint marks work too (1916-D merc). Branded bars match the maker (valcambi, pamp, geiger), the line (fortuna, rosa, combibar, security line), and the metal or weight (valcambi gold, 1 g, 1 gram, half gram)."],
   recents: ["Recents", "Searches, families and bulk lots you use show up here. A star count appears only when you search, clear, then search the same thing again. Frequent lists items used 2+ times. Saved on this device when browser storage is available; otherwise they last for this visit only."],
   spot: ["Spot and melt", "Spot is the Kitco bid and refreshed daily by routine; the timestamp shows when. Melt = weight (g) × fineness ÷ 31.1035 × spot."],
   badges: ["Badges", "Key: hardest, most valuable dates (low mintage or heavy melting). Semi: scarcer than common, well below keys; often cheap worn, pricey in mint state. Better: a bit scarcer, modest premium. Var: die variety (overdate, doubled die, mint-mark style) worth more than the normal coin. '× common' = price vs. the series median. Sellers often call any old coin a key date; if it isn't marked Key or Semi here, pay common-date prices."],
@@ -608,7 +608,7 @@ const worthGrading = (it: CollItem): GradeHint | null => {
 
 // v56/v57 hooks (cloud agents): external bb-ui.js / nugget-ui.js render via window globals
 const jx = (t: any, p: any) => h(t, p);
-function bbSection() { const w: any = window; return w.bbRender ? w.bbRender({ a: jx, W: Section, He: Text, D: useState, U: usd, ag: AG, au: AU, spotLabel: SPOT, spotSrc: TK.src }) : <Section heading="Branded bullion">{"Branded bullion did not load."}</Section>; }
+function bbSection() { const w: any = window; return w.bbRender ? w.bbRender({ a: jx, W: Section, He: Text, D: useState, E: useEffect, U: usd, ag: AG, au: AU, spotLabel: SPOT, spotSrc: TK.src }) : <Section heading="Branded bullion">{"Branded bullion did not load."}</Section>; }
 function NuggetSection() { const w: any = window; return w.renderNugget ? w.renderNugget({ a: jx, D: useState, ag: AG, au: AU, spotLabel: SPOT, spotSrc: TK.src, spotOk: TK.ok, spotUpdated: TK.upd }) : null; }
 export default function App() {
   const [q, setQ] = useState(() => { try { return new URLSearchParams(location.search).get("q") || ""; } catch (e) { return ""; } });
@@ -1181,12 +1181,15 @@ export default function App() {
           );
         }
         const all = SER.flatMap((s: Ser) => s.rows.filter((r: R) => (p.year ? fit(r) : true) && (!p.t || norm(r.lab + " " + r.iss + " " + r.note).includes(p.t))).map((r: R) => ({ s, r })));
-        cm.hits = all.length;
+        const bb = (typeof window !== "undefined" && (window as any).bbSearch) ? (window as any).bbSearch(q) : [];
+        cm.hits = all.length + bb.length;
+        const openBb = (hit: any) => { (window as any).__bbFocus = { id: hit.id, view: hit.view }; setQ(""); setTimeout(() => { const el = document.getElementById("bb-" + hit.id); if (el) el.scrollIntoView({ block: "start" }); }, 60); };
         return (
-          <Section heading={"Results: " + q} caption={all.length + " matches" + (all.length > 150 ? ", first 150 shown" : "")}>
-            {all.length === 1 ? card(all[0].s, all[0].r, 0) : <CT columns={["Badge", "Year", "Coin", "Price", "Issue", "Mintage", "Values"]} rows={all.slice(0, 150).map((x: { s: Ser; r: R }) => [badge(x.r.b), x.r.lab, short(x.s.name), pc(x.r.p || 0, CM[x.s.id]), x.r.iss, x.r.mint, x.r.vals])} />}
+          <Section heading={"Results: " + q} caption={(all.length + bb.length) + " matches" + (all.length > 150 ? ", first 150 shown" : "")}>
+            {all.length === 1 ? card(all[0].s, all[0].r, 0) : all.length > 1 ? <CT columns={["Badge", "Year", "Coin", "Price", "Issue", "Mintage", "Values"]} rows={all.slice(0, 150).map((x: { s: Ser; r: R }) => [badge(x.r.b), x.r.lab, short(x.s.name), pc(x.r.p || 0, CM[x.s.id]), x.r.iss, x.r.mint, x.r.vals])} /> : null}
             {(() => { const ss = [...new Set(all.map((x: { s: Ser; r: R }) => x.s))]; return ss.length <= 3 ? ss.map((s: Ser) => <div key={"f" + s.id}>{all.length > 1 && rowT(s, all.filter((x: { s: Ser; r: R }) => x.s === s).map((x: { s: Ser; r: R }) => x.r))}{fullSec(s.id, true)}</div>) : null; })()}
-            {!all.length && <Text>{"Nothing matched. Try a coin name like libertad, kook or morgan, or a year."}</Text>}
+            {bb.length > 0 && <Section heading={"Branded bullion (" + bb.length + ")"}>{bb.map((hit: any) => <button type="button" key={hit.id} class="bt" style={{ display: "block", width: "100%", textAlign: "left", margin: "4px 0", whiteSpace: "normal", overflowWrap: "anywhere" }} onClick={() => openBb(hit)}>{hit.title + " · " + hit.meta}</button>)}</Section>}
+            {!all.length && !bb.length && <Text>{"Nothing matched. Try a coin name like libertad, kook or morgan, or a year."}</Text>}
           </Section>
         );
       })()}
