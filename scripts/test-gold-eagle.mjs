@@ -27,9 +27,9 @@ for (const [, , oz] of sizes) {
 }
 if (!html.includes('["1/200 oz",.1555175]') || !src.includes('["1/200 oz", 0.1555175]')) throw new Error("1/200 oz row dropped");
 if (!html.includes('["1/20 oz",1.555175]') || !src.includes('["1/20 oz", 1.555175]')) throw new Error("1/20 oz row dropped");
-if (!html.includes('Va="v63"') || html.includes('Va="v62"')) throw new Error("app version");
-if (!src.includes('APP_VER = "v63"')) throw new Error("source version");
-if (!sw.includes("coin-lookup-v63") || sw.includes("coin-lookup-v62")) throw new Error("service worker");
+if (!html.includes('Va="v64"') || html.includes('Va="v63"')) throw new Error("app version");
+if (!src.includes('APP_VER = "v64"')) throw new Error("source version");
+if (!sw.includes("coin-lookup-v64") || sw.includes("coin-lookup-v63")) throw new Error("service worker");
 const sale = "https://www.ebay.com/itm/137911337774";
 if (!src.includes(sale) || !html.includes(sale)) throw new Error("sold link");
 if (!src.includes("$465.80 before tax") || !html.includes("$465.80 before tax")) throw new Error("shipping total");
@@ -62,5 +62,28 @@ for (const id of excluded) {
   if (src.includes(id) || html.includes(id)) throw new Error("excluded listing published: " + id);
 }
 if (!src.includes("Mint unknown (not assigned to 1921-P)") || !html.includes("Mint unknown (not assigned to 1921-P)")) throw new Error("unknown mint not labeled");
+const peaceRows = [
+  ['["1923 P", "", "30,800,000", "51", "47", "65.5", "78", ""]', '["1923 P","","30,800,000","51","47","65.5","78",""]'],
+  ['["1923 D", "", "6,811,000", "51", "76", "155", "389", ""]', '["1923 D","","6,811,000","51","76","155","389",""]'],
+  ['["1923 S", "", "19,020,000", "46", "61.2", "86", "321", ""]', '["1923 S","","19,020,000","46","61.2","86","321",""]'],
+];
+for (const [srcRow, htmlRow] of peaceRows) {
+  if (!src.includes(srcRow) || !html.includes(htmlRow)) throw new Error("Peace guide cell changed: " + srcRow.slice(0, 12));
+}
+const peaceSales = [
+  ["https://www.ebay.com/itm/820256773048", "US $71.25", "PCGS MS64", "not a 1923-P sale"],
+  ["https://www.ebay.com/itm/267827516856", "US $73.54", "NGC MS64", "not a 1923-P sale"],
+];
+for (const bits of peaceSales) {
+  for (const bit of bits) {
+    if (!src.includes(bit) || !html.includes(bit)) throw new Error("missing Peace sale detail: " + bit);
+  }
+}
+if (!src.includes("Shipping listed separately: US $7.00 USPS Ground Advantage") || !html.includes("Shipping listed separately: US $7.00 USPS Ground Advantage")) throw new Error("peace shipping");
+const peaceExcluded = ["206668438668", "257823584004", "227602890564", "900069927003", "307252150619", "307252151412", "307252152605", "307252155153", "960141580401", "900028617938", "236944183119", "880069385404", "128058665368", "307229396560", "940065992320"];
+for (const id of peaceExcluded) {
+  if (src.includes(id) || html.includes(id)) throw new Error("excluded Peace listing published: " + id);
+}
+if (src.includes("American Silver Eagle") && src.includes("observed eBay sale") && /American Silver Eagle[\s\S]{0,80}n=1/.test(src)) throw new Error("invented ASE sale");
 console.log("gold eagle size check passed");
 console.log("melts at $4000 spot:", sizes.map((s) => s[1] + " $" + (s[2] * 4000).toFixed(2)).join(", "));
