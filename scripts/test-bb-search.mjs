@@ -40,6 +40,11 @@ assert(window.bbSearch("valcambi").some((h) => h.view === "asks" && h.meta.inclu
 assert(JSON.stringify(window.BBDATA) === before || window.BBDATA.lines[0].quotes[0].ask === 193.22, "price data changed");
 const v1 = window.BBDATA.lines.find((l) => l.id === "valcambi-au-1g");
 assert(v1.quotes[0].ask === 158.09 && v1.quotes[1].ask === 153.92, "valcambi 1g asks changed");
+assert(src.includes("dimes/mercury|1936 P|Proof"), "cl-build/app.tsx missing dimes/mercury|1936 P|Proof");
+assert(src.includes("dimes/mercury|1938 P|Proof") && src.includes("dimes/mercury|1942 P|Proof"), "mercury 1938/1942 notes missing");
+assert(src.includes("Proof rows (1936–42, Philadelphia, no mint mark)"), "mercury proof flag missing");
+assert(src.includes('["1936 P", "Proof", "4,130"') && src.includes('["1942 P", "Proof", "22,329"'), "mercury proof rows missing");
+assert(html.includes("dimes/mercury|1936 P|Proof") && html.includes('["1936 P","Proof","4,130"'), "index missing v65 mercury proof content");
 assert(src.includes("window as any).bbSearch") && html.includes("window.bbSearch"), "search not wired");
 assert(src.includes("__bbFocus") && html.includes("__bbFocus"), "result does not open the row");
 assert(!html.includes("Va=\"v65\"") && src.includes('APP_VER = "v66"'), "version");
