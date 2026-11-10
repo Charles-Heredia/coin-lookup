@@ -10,7 +10,7 @@ if (typeof window !== "undefined") { (window as any).fmtLocal = fmtLocal; (windo
 export let AG = 51.83;
 export let AU = 4063.80;
 export let SPOT = "Nov 6, 2026, ~2:30 PM ET (Kitco)";
-const APP_VER = "v68";
+const APP_VER = "v69";
 /** Retail D[] scrub Nov 6, 2026: PriceCharting full-guide aggregates only. Worn column uses PC Ungraded as raw/ungraded substitute — not a specific G/VG/F. Not individual eBay sold lots. Varieties/proofs/types left unchanged without exact page match. */
 const PRICE_SCRUB_NOTE = "Weekly sold-price refresh Nov 8, 2026 (v62): PriceCharting full-guide values (built from completed sales) re-pulled for every US series row; a cell changed only when the grade had 3+ recent sold listings, moved 3%+, and stayed above melt for silver; thin or suspicious cells kept their prior value. ASE raw re-pulled the same way for plain bullion, proof and burnished rows. CoinGrader eBay sold data (Mexico, world bullion) has had no new sales since Jul 23, 2026, so those values are unchanged. Earlier: Price guide scrub Nov 6, 2026 (PriceCharting full-guide aggregates). Worn = PC Ungraded as raw/ungraded substitute (not a specific worn grade). AU/MS62/MS64 = PC guide. Not verified individual sold comps. Varieties/proofs unchanged without exact match. Variety auction solds (PCGS Auction Prices / Stack's / Heritage, checked Nov 6, 2026): 1955 DDO AU=$2280 (Stack's AU53 Nov-2025), MS62=$2880 (Heritage MS62BN Nov-2025); MS64 left blank (MS64RD color-specific). Other varieties/ASE finishes/Mexico/Trump/PS unchanged — GC/Heritage lot pages hide hammers without login; no merchant asks used. Branded bullion asks checked Nov 6, 2026 (dealer asks, not sold prices). Raw nugget calculator uses 31.1034768 g per troy oz and does not assume purity. Sterling silver preset is 92.5%. American Gold Eagle bullion sizes are 1 oz, 1/2 oz, 1/4 oz, and 1/10 oz fine gold; face values are denominations. One observed 1/10 oz Gold Eagle eBay sale (item 137911337774, Nov 7, 2026) is labeled n=1, not a typical price. Three observed 1921 Morgan eBay sales (NGC MS62 mint unknown item 237161527950, 1921-D PCGS MS62 item 900059971544, 1921-S NGC MS64 item 800889297167) are each labeled n=1 and do not replace guide cells. Two observed 1923 Peace dollar eBay sales (PCGS MS64 mint unknown item 820256773048, NGC MS64 mint unknown item 267827516856) are each labeled n=1, are not 1923-P, and do not replace guide cells.";
 const melt = (oz: number) => "$" + (oz * AG).toFixed(2);
@@ -461,7 +461,7 @@ const NOTE: Record<string, [string, string]> = {
   badges: ["Badges", "Key: hardest, most valuable dates (low mintage or heavy melting). Semi: scarcer than common, well below keys; often cheap worn, pricey in mint state. Better: a bit scarcer, modest premium. Var: die variety (overdate, doubled die, mint-mark style) worth more than the normal coin. '× common' = price vs. the series median. Sellers often call any old coin a key date; if it isn't marked Key or Semi here, pay common-date prices."],
   vals: ["Series values", "Mintages from USA Coin Book series tables. Values are PriceCharting sold-price guide columns (Ungraded as worn, AU, MS62, MS64) pulled Nov 2, 2026; blank means no PriceCharting entry for that date or variety. Empty columns are hidden."],
   bulk: ["Bulk units", "oz = avoirdupois (28.35 g), what kitchen/postal scales and sellers use. Troy oz (31.1 g) gives ~10% more coins. Subtract bags/rolls/tubes before converting. Steel 1943s (2.70 g) and Memorial cents mixed in skew counts and lower value; 1909-39 date lots sell ~3× higher."],
-  wheat: ["Wheat prices", "Wheat sources (2026): eBay sold 1 lb unsearched 1909-58, $17.45 + $9.95 ship (Jan 17); eBay asks 1,000 wheats $89.95 (~9¢/coin + ship), 1 lb asks $13.62-$34.99; Maxsold ~5.5 lb mostly wheat + folder $235 (Feb 26, inflated). Other coin types: bulk premium not sourced; count and melt only."],
+  wheat: ["How bulk is valued", "Every type gets an est. number (Nov 10, 2026). Silver types (90%, 40%, war nickels): silver melt at the live spot above; 90% junk trades near melt. Morgan/Peace: common circulated dealer asks $46.72 (JM Bullion Peace VG-XF) to $55.30 (APMEX Morgan VG-VF) each. Wheat cents: eBay sold 1 lb unsearched $17.45 + $9.95 ship (Jan 17, 2026) to ~$27.40/lb; 1,000-wheat asks $89.95 (~9¢/coin). Buffalo nickels (no precious metal; 75% copper/25% nickel metal is only ~7¢): mixed/unsearched 20¢-$1.13 each (203 mixed sold $40 = 20¢, Collectors Universe Sep 2026; no-date rolls of 40 $8 Nickel Trader to $19.95 Great American Coin = 20-50¢; full-date common rolls $39.95 eBay Toomba's to $45 Nickel Trader = $1.00-1.13). Indian cents: cull/AG dealer asks $1.39 (APMEX 100+) to $1.95 (eBay MB Coins). 1943 steel cents: 50-coin circulated rolls $23.99 (Midwest Precious Metals) to $39 (ICC) = 48-78¢. Copper Lincolns (pre-1982): copper metal value (95% Cu x COMEX copper $6.22/lb settle Nov 10, 2026); melting cents is illegal and bulk buyers pay near face to 2¢. Jefferson nickels: the higher of face (5¢) or metal (~7¢; LME nickel ~$7.34/lb). Zinc cents and clad: face value. Asks are not sold prices; dealers buy lower. Counts from weight use the standard coin weight; worn coins weigh a bit less, so the real count runs slightly higher."],
   ps: ["Proof set prices", "Proofsets.com dealer list prices (asks, not sold data), Nov 3, 2026; blank = not sourced. Melt uses the silver spot at top."],
   bullion: ["Bullion bid cap", "Melt is computed live from spot. Dealer price is SD Bullion's lowest tier on Nov 2, 2026. Never pay more than the dealer price shown, shipping included (melt plus the typical premium). On Whatnot, aim for melt plus about half that premium."],
   snag: ["Snag list and snag cap", "Snag list = the top 5 sold-price years per series, plus unpriced Key dates (e.g. 1995-W proof ASE, 1983-85 proof Pandas) as the real prizes. Snag cap is my rule of thumb, not a market figure: about 70% of typical sold price, but never below melt + 5%, and never above the sold price. Prices come from the sources already used for each series (PriceCharting for ASE; CoinGrader eBay sold for Panda, Kook, Maple, Britannia, Libertad, Philharmonic, Gold Eagle). Koala, Kangaroo, Elephant and Lunar were added from CoinGrader eBay sold data (Sep 2025–Jul 2026, years with 3+ sales). Lunar years mix Series I/II/III, and the 2023 Kangaroo price looks like an outlier, so check before trusting it. Krugerrand, Gold Buffalo and Queen's Beasts are still unpriced (CoinGrader's Krugerrand data mixes sizes and metals; Beasts has under 3 sales per year). Tell = mintage, badge, or note. Sold prices are from before the current spot, so melt can move the cap."],
@@ -878,7 +878,7 @@ export default function App() {
   const star = (raw: string) => { const v = raw.toLowerCase().replace(/\s+/g, " ").trim(); cm.last = ""; setRec((p: RI[]) => { const o = p.find((x: RI) => x.k === "search" && x.v.toLowerCase().replace(/\s+/g, " ").trim() === v); const rest = p.filter((x: RI) => x !== o); return [{ k: "search", l: o ? o.l : v, v: o ? o.v : v, t: Date.now(), c: o ? o.c : 1, s: (o ? stc(o) : 0) + 1 }, ...rest].slice(0, 40); }); };
   useEffect(() => { const s = q.trim(); if (!s) { const pv = cm.prev; cm.prev = ""; if (pv && pv.length >= 3 && cm.ph > 0) star(pv); return; } if (s.length >= 3 && !(cm.prev.startsWith(s) && s.length < cm.prev.length)) { cm.prev = s; cm.ph = cm.hits; } if (s.length < 3) return; const id = setTimeout(() => { const lo = s.toLowerCase(); if (lo === cm.last) return; cm.last = lo; addRec("search", s, s, false); }, 1500); return () => clearTimeout(id); }, [q]);
   useEffect(() => { if (fam === "All") return; addRec("family", "Family: " + fam, fam, false); }, [fam]);
-  const BN: Record<string, string> = { wheat: "wheat cents", steel: "steel cents", copper: "copper Lincolns", indian: "Indian cents", nickel: "nickels", war: "war nickels", dime: "90% dimes", quarter: "90% quarters", half: "90% halves", dollar: "silver dollars" };
+  const BN: Record<string, string> = { wheat: "wheat cents", steel: "steel cents", copper: "copper Lincolns", indian: "Indian cents", nickel: "Buffalo nickels", bufnd: "no-date Buffalo nickels", bufd: "full-date Buffalo nickels", jeff: "Jefferson nickels", war: "war nickels", dime: "90% dimes", quarter: "90% quarters", half: "90% halves", k40: "40% halves", dollar: "silver dollars", zinc: "zinc cents", cdime: "clad dimes", cquarter: "clad quarters", chalf: "clad halves" };
   const reopen = (x: RI) => { if (x.k === "search") { cm.last = x.v.toLowerCase(); cm.emptied = false; setQ(x.v); try { scrollTo(0, 0); } catch (e) {} } else if (x.k === "family") { setQ(""); setFam(x.v); } else if (x.k === "bulk") { setQ(""); setBo((n: number) => n + 1); setTimeout(() => { const el = document.getElementById("bulk"); if (el) el.scrollIntoView({ block: "start" }); }, 50); if (x.v.startsWith("[")) { try { setLot(JSON.parse(x.v)); } catch (e) {} } else { const [w, u, c] = x.v.split("|"); setBw(w); setBu(u); setBc(c); setLot([{ c, m: "w", v: w, u }]); } } addRec(x.k, x.l, x.v, false); };
   const USUAL: RI[] = [["1921 morgan"], ["1966 kennedy"], ["1943 walking liberty"], ["1904 indian"], ["libertad"], ["silver eagle"], ["sunshine"]].map((a: string[]) => ({ k: "search", l: a[0], v: a[0], t: 0, c: 0 })).concat([{ k: "bulk", l: "Wheat cents by weight (10.7 oz)", v: "10.7|oz|wheat", t: 0, c: 0 }]);
   const fams = ["All", "Dollars", "Halves", "Quarters", "Dimes", "Nickels", "Cents", "Proof sets", "Bullion and world", "World coins"];
@@ -1297,26 +1297,49 @@ export default function App() {
       <div id="bulk" />
       <Section key={"bulk" + bo} heading="Bulk / by weight" collapsible defaultOpen={bo > 0}>
         {(() => {
-          const BT: Record<string, { n: string; g: number; asw: number }> = {
-            wheat: { n: "Wheat cent (1909-58)", g: 3.11, asw: 0 },
-            steel: { n: "1943 steel cent", g: 2.7, asw: 0 },
-            copper: { n: "Copper Lincoln (pre-1982)", g: 3.11, asw: 0 },
-            indian: { n: "Indian cent (1864-1909)", g: 3.11, asw: 0 },
-            nickel: { n: "Buffalo/Jefferson nickel", g: 5.0, asw: 0 },
-            war: { n: "35% silver war nickel", g: 5.0, asw: 0.05626 },
-            dime: { n: "90% dime", g: 2.5, asw: 0.0723 },
-            quarter: { n: "90% quarter", g: 6.25, asw: 0.1808 },
-            half: { n: "90% half", g: 12.5, asw: 0.3617 },
-            dollar: { n: "Morgan/Peace dollar", g: 26.73, asw: 0.7734 },
+          // v69: every bulk type gets an est. value (Nov 10, 2026 sources in the "How bulk is valued" note)
+          const CUP = 6.22, NIP = 7.34, LBG = 453.592; // COMEX copper settle $/lb Nov 10 2026; LME nickel cash ~$16,185/t
+          type BTi = { n: string; g: number; asw: number; cu?: number; ni?: number; face?: number; lo?: number; hi?: number; lb?: number[]; src: string };
+          const BT: Record<string, BTi> = {
+            wheat: { n: "Wheat cent (1909-58)", g: 3.11, asw: 0, cu: 0.95, lb: [17.45, 27.4], src: "bulk sold ~$17.45-27.40/lb (eBay, 2026)" },
+            steel: { n: "1943 steel cent", g: 2.7, asw: 0, lo: 0.48, hi: 0.78, src: "dealer asks 48-78¢/coin (50-coin rolls $23.99-$39, Nov 2026)" },
+            copper: { n: "Copper Lincoln (pre-1982)", g: 3.11, asw: 0, cu: 0.95, src: "copper metal value, 95% Cu at $6.22/lb COMEX (Nov 10, 2026)" },
+            indian: { n: "Indian cent (1864-1909)", g: 3.11, asw: 0, cu: 0.95, lo: 1.39, hi: 1.95, src: "cull/AG dealer asks $1.39-1.95/coin (APMEX, eBay, Nov 2026)" },
+            nickel: { n: "Buffalo nickel (1913-38), mixed/unsearched", g: 5.0, asw: 0, cu: 0.75, ni: 0.25, lo: 0.2, hi: 1.13, src: "bulk sold/asks 20¢ (no date) to $1.13 (full date) per coin (2026)" },
+            bufnd: { n: "Buffalo nickel, no date", g: 5.0, asw: 0, cu: 0.75, ni: 0.25, lo: 0.2, hi: 0.5, src: "no-date rolls $8-19.95 per 40 = 20-50¢/coin (Nickel Trader, Great American Coin)" },
+            bufd: { n: "Buffalo nickel, full date (common)", g: 5.0, asw: 0, cu: 0.75, ni: 0.25, lo: 1.0, hi: 1.13, src: "full-date rolls $39.95-45 per 40 = $1.00-1.13/coin (eBay, Nickel Trader)" },
+            jeff: { n: "Jefferson nickel (non-silver)", g: 5.0, asw: 0, cu: 0.75, ni: 0.25, face: 0.05, src: "higher of face 5¢ or Cu/Ni metal (Nov 10, 2026)" },
+            war: { n: "35% silver war nickel", g: 5.0, asw: 0.05626, src: "silver melt (dealer rolls ~$2.88/coin, Nickel Trader)" },
+            dime: { n: "90% dime", g: 2.5, asw: 0.0723, src: "silver melt (90% junk trades near melt)" },
+            quarter: { n: "90% quarter", g: 6.25, asw: 0.1808, src: "silver melt (90% junk trades near melt)" },
+            half: { n: "90% half", g: 12.5, asw: 0.3617, src: "silver melt (90% junk trades near melt)" },
+            k40: { n: "40% Kennedy half (1965-70)", g: 11.5, asw: 0.1479, src: "silver melt" },
+            dollar: { n: "Morgan/Peace dollar", g: 26.73, asw: 0.7734, lo: 46.72, hi: 55.3, src: "common circ. dealer asks $46.72-55.30 each (JM, APMEX, Nov 10, 2026)" },
+            zinc: { n: "Zinc Lincoln cent (1982+)", g: 2.5, asw: 0, face: 0.01, src: "face value" },
+            cdime: { n: "Clad dime (1965+)", g: 2.268, asw: 0, face: 0.1, src: "face value" },
+            cquarter: { n: "Clad quarter (1965+)", g: 5.67, asw: 0, face: 0.25, src: "face value" },
+            chalf: { n: "Clad half (1971+)", g: 11.34, asw: 0, face: 0.5, src: "face value" },
           };
           const UG: Record<string, number> = { oz: 28.3495, lb: 453.592, g: 1 };
-          const calc = (r: LR) => { const t = BT[r.c]; const x = parseFloat(r.v) || 0; const n = r.m === "n" ? Math.round(x) : (x * UG[r.u]) / t.g; const g = r.m === "n" ? x * t.g : x * UG[r.u]; return { t, n, g, ag: n * t.asw, lo: r.c === "wheat" ? (g / 453.592) * 17.45 : 0, hi: r.c === "wheat" ? (g / 453.592) * 27.4 : 0, cap: r.c === "wheat" ? n * 0.15 : 0 }; };
+          const calc = (r: LR) => {
+            const t = BT[r.c] || BT.wheat; const x = parseFloat(r.v) || 0; const n = r.m === "n" ? Math.round(x) : (x * (UG[r.u] || 1)) / t.g; const g = r.m === "n" ? x * t.g : x * (UG[r.u] || 1);
+            const ag = n * t.asw; const melt = ag * AG; const metal = n * t.g * ((t.cu || 0) * CUP + (t.ni || 0) * NIP) / LBG;
+            let lo = 0, hi = 0;
+            if (t.lb) { lo = (g / LBG) * t.lb[0]; hi = (g / LBG) * t.lb[1]; }
+            else if (t.lo != null) { lo = n * t.lo; hi = n * (t.hi || t.lo); }
+            else if (t.asw) { lo = hi = melt; }
+            else if (t.face != null) { lo = hi = Math.max(n * t.face, metal); }
+            else { lo = hi = metal; }
+            return { t, n, g, ag, melt, metal, lo, hi, est: (lo + hi) / 2, cap: r.c === "wheat" ? n * 0.15 : 0 };
+          };
           const cs = lot.map(calc);
-          const tot = cs.reduce((a, c) => ({ n: a.n + c.n, g: a.g + c.g, ag: a.ag + c.ag, lo: a.lo + c.lo, hi: a.hi + c.hi, cap: a.cap + c.cap }), { n: 0, g: 0, ag: 0, lo: 0, hi: 0, cap: 0 });
+          const tot = cs.reduce((a, c) => ({ n: a.n + c.n, g: a.g + c.g, ag: a.ag + c.ag, lo: a.lo + c.lo, hi: a.hi + c.hi, est: a.est + c.est, cap: a.cap + c.cap }), { n: 0, g: 0, ag: 0, lo: 0, hi: 0, est: 0, cap: 0 });
+          const m$ = (v: number) => "$" + v.toFixed(2);
+          const rng = (lo: number, hi: number) => (Math.abs(hi - lo) < 0.005 ? m$(lo) + " est." : m$(lo) + " - " + m$(hi) + " est. (mid " + m$((lo + hi) / 2) + ")");
           const lotLabel = lot.map((r: LR) => (r.m === "n" ? r.v + " " : r.v + " " + r.u + " ") + BN[r.c]).join(" + ");
           return (
             <>
-              {lot.map((r: LR, i: number) => { const c = cs[i]; const items: { label: string; value: string }[] = [{ label: "Coins", value: (r.m === "n" ? "" : "~") + Math.round(c.n) }, { label: "Weight", value: c.g.toFixed(1) + " g (" + (c.g / 28.3495).toFixed(2) + " oz)" }]; if (c.ag) items.push({ label: "Silver melt", value: "$" + (c.ag * AG).toFixed(2) + " (" + c.ag.toFixed(2) + " oz ASW)" }); if (c.hi) { items.push({ label: "Bulk value (sold ~$17-27/lb)", value: "$" + c.lo.toFixed(2) + " - $" + c.hi.toFixed(2) }); items.push({ label: "Bid cap (~15¢/coin, my heuristic)", value: "$" + c.cap.toFixed(2) }); } return (
+              {lot.map((r: LR, i: number) => { const c = cs[i]; const items: { label: string; value: string }[] = [{ label: "Coins", value: (r.m === "n" ? "" : "~") + Math.round(c.n) + (r.m === "n" ? "" : " (from " + c.t.g + " g each)") }, { label: "Weight", value: c.g.toFixed(1) + " g (" + (c.g / 28.3495).toFixed(2) + " oz)" }]; items.push({ label: "Est. value", value: rng(c.lo, c.hi) }); items.push({ label: "Valued by", value: c.t.src }); if (c.ag) items.push({ label: "Silver melt", value: m$(c.melt) + " (" + c.ag.toFixed(2) + " oz ASW)" }); if (c.metal) items.push({ label: (c.t.ni ? "Copper-nickel" : "Copper") + " metal value", value: m$(c.metal) + " est." }); if (r.c === "nickel" || r.c === "bufnd" || r.c === "bufd") items.push({ label: "Dates", value: "No-date coins ~20-50¢, full readable dates ~$1.00-1.13; pick no date / full date above if sorted" }); if (r.c === "wheat") { items.push({ label: "Bid cap (~15¢/coin, my heuristic)", value: m$(c.cap) }); } return (
                 <div key={"lot" + i} style={{ maxWidth: "100%", borderTop: i ? "1px solid rgba(128,128,128,0.3)" : "none", paddingTop: i ? 8 : 0 }}>
                   <Select value={r.c} onChange={(v: string) => setRow(i, { c: v })} options={Object.keys(BT).map((k: string) => ({ value: k, label: BT[k].n + " (" + BT[k].g + " g)" }))} />
                   <Segmented value={r.m} onChange={(v: string) => setRow(i, { m: v })} options={[{ value: "w", label: "By weight" }, { value: "n", label: "By count" }]} />
@@ -1327,10 +1350,10 @@ export default function App() {
                 </div>
               ); })}
               <Button label="+ Add coin row" onClick={() => setLot((p: LR[]) => [...p, { c: "dime", m: "n", v: "", u: "oz" }])} />
-              {lot.length > 1 && <Properties items={[{ label: "Lot total coins", value: String(Math.round(tot.n)) }, { label: "Lot total weight", value: tot.g.toFixed(1) + " g (" + (tot.g / 28.3495).toFixed(2) + " oz)" }, { label: "Lot silver melt", value: "$" + (tot.ag * AG).toFixed(2) + " (" + tot.ag.toFixed(2) + " oz ASW)" }, ...(tot.hi ? [{ label: "Wheat bulk value", value: "$" + tot.lo.toFixed(2) + " - $" + tot.hi.toFixed(2) }, { label: "Wheat bid cap", value: "$" + tot.cap.toFixed(2) }] : [])]} />}
+              <Properties items={[{ label: lot.length > 1 ? "Lot total coins" : "Total coins", value: "~" + String(Math.round(tot.n)) }, { label: lot.length > 1 ? "Lot total weight" : "Total weight", value: tot.g.toFixed(1) + " g (" + (tot.g / 28.3495).toFixed(2) + " oz)" }, { label: lot.length > 1 ? "Lot total est. value" : "Total est. value", value: rng(tot.lo, tot.hi) }, ...(tot.ag ? [{ label: "Lot silver melt", value: m$(tot.ag * AG) + " (" + tot.ag.toFixed(2) + " oz ASW)" }] : []), ...(tot.cap ? [{ label: "Wheat bid cap", value: m$(tot.cap) }] : [])]} />
               <Button label="Save to recents" onClick={() => addRec("bulk", "Lot: " + lotLabel, JSON.stringify(lot), false)} />
               <I k="bulk" t="Units" />
-              <I k="wheat" t="Wheat prices" />
+              <I k="wheat" t="How bulk is valued" />
             </>
           );
         })()}
