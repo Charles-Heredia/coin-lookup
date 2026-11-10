@@ -1,9 +1,44 @@
 /**
- * Build bb-data.js from the Nov 6, 2026 HST research files.
+ * Build bb-data.js from the Nov 6, 2026 research files.
+ * Check times are written as ISO instants with an offset (never an HST label).
  * Numbers are copied from those files. Premiums are not recomputed.
  * Run: node scripts/build-branded-bullion.mjs [asks.json] [inventory.json] [sold.json]
  */
 import { readFileSync, writeFileSync } from "fs";
+
+
+const ZONE_OFFSET = { HST: "-10:00", HDT: "-09:00", PST: "-08:00", PDT: "-07:00", MST: "-07:00", MDT: "-06:00", CST: "-06:00", CDT: "-05:00", EST: "-05:00", EDT: "-04:00" };
+const pad2 = (n) => String(n).padStart(2, "0");
+/** Convert HST/PST-labeled stamps to ISO instants with an offset. Date-only values are left as calendar dates. */
+function toIsoInstant(s) {
+  if (s == null || s === "") return s;
+  if (typeof s !== "string") return s;
+  let out = s;
+  out = out.replace(
+    /(\d{4}-\d{2}-\d{2})\s*~(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})\s*(HST|HDT|PST|PDT|MST|MDT|CST|CDT|EST|EDT)\b/gi,
+    (_, date, h1, m1, h2, m2, z) => {
+      const off = ZONE_OFFSET[z.toUpperCase()];
+      return `~${date}T${pad2(h1)}:${m1}:00${off}/${date}T${pad2(h2)}:${m2}:00${off}`;
+    }
+  );
+  out = out.replace(
+    /(\d{4}-\d{2}-\d{2})\s*~(\d{1,2}):(\d{2})\s*(HST|HDT|PST|PDT|MST|MDT|CST|CDT|EST|EDT)\b(?:\s*\([^)]*\bHST\b[^)]*\))?/gi,
+    (_, date, h, m, z) => `~${date}T${pad2(h)}:${m}:00${ZONE_OFFSET[z.toUpperCase()]}`
+  );
+  out = out.replace(
+    /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)\s*(HST|HDT|PST|PDT|MST|MDT|CST|CDT|EST|EDT)\b/gi,
+    (_, iso, z) => iso + ZONE_OFFSET[z.toUpperCase()]
+  );
+  out = out.replace(
+    /(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?\s*(HST|HDT|PST|PDT|MST|MDT|CST|CDT|EST|EDT)\b/gi,
+    (_, date, h, m, sec, z) => `${date}T${pad2(h)}:${m}:${sec || "00"}${ZONE_OFFSET[z.toUpperCase()]}`
+  );
+  out = out.replace(/\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},\s+\d{4})\s*HST\b/g, "$1");
+  out = out.replace(/\b(\d{4}-\d{2}-\d{2})\s*HST\b/g, "$1");
+  out = out.replace(/\s*\bHST\b/g, "");
+  return out;
+}
+
 
 const asksPath = process.argv[2] || "/home/ubuntu/.cursor/projects/workspace/uploads/implementation-ready-asks_59b6.json";
 const invPath = process.argv[3] || "/home/ubuntu/.cursor/projects/workspace/uploads/manufacturer-inventory-with-blanks_6e0d.json";
@@ -170,7 +205,7 @@ function noteFor(o) {
     return "The same Hero page also says “For a Limited Time – Just $69 Over Spot Per Bar.” That slogan is not the premium. Ask minus the dealer header spot ($" + o.displayed_spot_usd_oz + ") is $" + o.reference_premium_usd + " (" + o.reference_premium_pct + "%).";
   }
   if (s.includes("apmex.com")) {
-    return "APMEX also showed a spot of $4,081.80 timestamped 2026-11-06 11:59 HST, older than this page check. That spot is not used. Premium stays blank. Stock was not asserted.";
+    return "APMEX also showed a spot of $4,081.80 timestamped 2026-11-06T11:59:00-10:00, older than this page check. That spot is not used. Premium stays blank. Stock was not asserted.";
   }
   if (s.includes("bullionstandard.com")) {
     return "An unlabeled 1+ price (lower than this check/wire ask) was excluded. It may be member or wholesale. Stock and numeric spot were not supplied.";
@@ -222,11 +257,11 @@ for (const o of asks.observations) {
     pay: o.payment || "",
     ship: o.shipping_tax || "",
     spot: numOrNull(o.displayed_spot_usd_oz),
-    spotChecked: o.spot_checked_hst || null,
+    spotChecked: toIsoInstant(o.spot_checked_hst) || null,
     premUsd: numOrNull(o.reference_premium_usd),
     premPct: numOrNull(o.reference_premium_pct),
     premBasis: o.reference_premium_basis || null,
-    checked: o.checked_hst,
+    checked: toIsoInstant(o.checked_hst),
     url: o.source,
     srcWeight: o.weight || "",
     note: noteFor(o),
@@ -314,7 +349,7 @@ for (const row of inv) {
     eur: euros[0] || null,
     eurRegular: regular ? regular.replace(/\s+/g, "") : (euros[1] || null),
     url: row.official_source,
-    checked: row.checked_hst,
+    checked: toIsoInstant(row.checked_hst),
     add: true,
   });
 }
@@ -357,7 +392,7 @@ const sold = soldFile.observations.map((o) => {
     line: o.line || null,
     weight,
     count,
-    date: o.date || o.date_hst || null,
+    date: toIsoInstant(o.date || o.date_hst || null),
     currency: o.currency,
     lot: o.lot ?? null,
     hammerLot,
@@ -405,7 +440,7 @@ for (const line of lines) {
 }
 
 const data = {
-  checked: asks.checked_hst,
+  checked: toIsoInstant(asks.checked_hst),
   labels: asks.labels,
   soldRule: soldFile.rule,
   lines,

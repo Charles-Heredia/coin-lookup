@@ -1,4 +1,10 @@
-/* Branded bullion reference. Data is window.BBDATA from the Nov 6, 2026 HST check. */
+/* Branded bullion reference. Data is window.BBDATA; check times are absolute instants, shown in the viewer's local time. */
+
+function bbTime(s) {
+  if (s == null || s === "") return s;
+  if (typeof window !== "undefined" && typeof window.fmtLocalText === "function") return window.fmtLocalText(s);
+  return String(s);
+}
 function bbNorm(s) {
   return String(s || "").toLowerCase().replace(/×/g, "x").replace(/,/g, ".").replace(/½/g, "1/2").replace(/[^a-z0-9./]+/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -162,7 +168,7 @@ window.bbRender = function (api) {
     if (q.premUsd == null && q.premPct == null) {
       return a("p", { class: "bbnote", children: "Same-time reference premium: —" + (q.spot == null ? " No dealer spot was captured with this ask, so none is calculated." : " Not calculated for this quote.") });
     }
-    return a("p", { class: "bbnote", children: "Same-time reference premium: " + signed(q.premUsd) + " (" + pct(q.premPct) + ") against displayed spot " + money(q.spot) + (q.spotChecked ? " checked " + q.spotChecked : "") + ". " + (q.premBasis || "Ask minus labeled fine weight times that spot.") });
+    return a("p", { class: "bbnote", children: "Same-time reference premium: " + signed(q.premUsd) + " (" + pct(q.premPct) + ") against displayed spot " + money(q.spot) + (q.spotChecked ? " checked " + bbTime(q.spotChecked) : "") + ". " + (q.premBasis || "Ask minus labeled fine weight times that spot.") });
   }
   function quoteBlock(line, q) {
     const price = q.ask != null ? q.ask : null;
@@ -177,8 +183,8 @@ window.bbRender = function (api) {
       q.tier ? a("p", { class: "bbnote", children: "Tier: " + q.tier }) : null,
       q.pay ? a("p", { class: "bbnote", children: "Payment: " + q.pay }) : null,
       q.ship ? a("p", { class: "bbnote", children: "Shipping and tax: " + q.ship }) : null,
-      a("p", { class: "bbnote", children: "Checked: " + q.checked }),
-      q.note ? a("p", { class: "bbnote", children: q.note }) : null,
+      a("p", { class: "bbnote", children: "Checked: " + bbTime(q.checked) }),
+      q.note ? a("p", { class: "bbnote", children: bbTime(q.note) }) : null,
       a("a", { class: "bblink", href: q.url, target: "_blank", rel: "noopener noreferrer", children: "Source · " + q.dealer }),
     ]) });
   }
@@ -234,7 +240,7 @@ window.bbRender = function (api) {
       a("div", { class: "bbname", children: s.maker + (s.metal ? " " + s.metal : "") + " · " + s.weight }),
       s.line ? a("p", { class: "bbnote", children: s.line }) : null,
       s.condition ? a("p", { class: "bbnote", children: s.condition }) : null,
-      a("div", { class: "bbsub bbcenter", children: "Lot total · " + (s.date || "date not stated") + (s.lot != null ? " · lot " + s.lot : "") }),
+      a("div", { class: "bbsub bbcenter", children: "Lot total · " + (s.date ? bbTime(s.date) : "date not stated") + (s.lot != null ? " · lot " + s.lot : "") }),
       a("div", { class: "bbbig", children: cur(s.currency, s.total) }),
       a("p", { class: "bbnote", children: s.totalLabel || "Lot total as archived" }),
       s.count > 1 ? a("p", { class: "bbnote", children: "This is one lot of " + s.count + ". The lot total is not the price of a single bar, and it is not " + s.count + " separate sales." }) : null,
@@ -262,7 +268,7 @@ window.bbRender = function (api) {
       a("div", { class: "bbbig", children: o.eur || "—" }),
       o.eurRegular ? a("p", { class: "bbnote bbcenter", children: "Regular price on the list: " + o.eurRegular }) : null,
       a("p", { class: "bbnote", children: "No USD ask is matched to this row. EUR is not turned into a dollar premium. Same-time premium: —" }),
-      a("p", { class: "bbnote", children: "Checked: " + o.checked }),
+      a("p", { class: "bbnote", children: "Checked: " + bbTime(o.checked) }),
       a("a", { class: "bblink", href: o.url, target: "_blank", rel: "noopener noreferrer", children: "Source · Geiger price list" }),
     ]) });
   }
@@ -296,7 +302,7 @@ window.bbRender = function (api) {
     defaultOpen: !!(focus && focus.id),
     caption: "Geiger, PAMP, Valcambi · dated asks, not sold prices",
     children: [
-      a(He, { children: "Dealer prices are asks observed on 2026-11-06 HST (" + data.lines.reduce((n, l) => n + l.quotes.length, 0) + " quotes). They are not sold prices and may be gone. Card, crypto, and quantity tiers are not substituted for the cash single-unit figure. Shipping and tax are excluded. A blank means that value was not established." }),
+      a(He, { children: "Dealer prices are asks observed " + bbTime(data.checked) + " (" + data.lines.reduce((n, l) => n + l.quotes.length, 0) + " quotes). They are not sold prices and may be gone. Card, crypto, and quantity tiers are not substituted for the cash single-unit figure. Shipping and tax are excluded. A blank means that value was not established." }),
       a(He, { children: "Melt uses the labeled fine weight times the app’s live spot (the ticker). A 1 oz .999 bar is already one troy ounce of metal, so purity is not discounted again. “Same-time reference premium” uses only a dealer spot captured with that ask. “Vs today’s app spot” moves when the ticker moves and is not that historical premium. The ticker can be cached." }),
       a(He, { children: "Brand, fractional size, and assay packaging can put an ask far above melt. Nothing here shows a buyback. Paying the ask does not mean that premium comes back on resale. Dealer bids can be much lower." }),
       a(He, { children: "Geiger Original square, cast, Security Line, and the vintage rectangle are different bars. PAMP Lady Fortuna, Rosa, cast, and the USA-logo bar are different products. A Valcambi CombiBar price is for the full sheet, not a detached gram." }),
