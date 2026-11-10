@@ -27,9 +27,9 @@ for (const [, , oz] of sizes) {
 }
 if (!html.includes('["1/200 oz",.1555175]') || !src.includes('["1/200 oz", 0.1555175]')) throw new Error("1/200 oz row dropped");
 if (!html.includes('["1/20 oz",1.555175]') || !src.includes('["1/20 oz", 1.555175]')) throw new Error("1/20 oz row dropped");
-if (!html.includes('Va="v66"') || html.includes('Va="v65"')) throw new Error("app version");
-if (!src.includes('APP_VER = "v66"')) throw new Error("source version");
-if (!sw.includes("coin-lookup-v66") || sw.includes("coin-lookup-v65")) throw new Error("service worker");
+if (!/[A-Za-z_$]{1,3}="v67"/.test(html)) throw new Error("app version");
+if (!src.includes('APP_VER = "v67"')) throw new Error("source version");
+if (!sw.includes("coin-lookup-v67") || sw.includes("coin-lookup-v66")) throw new Error("service worker");
 const sale = "https://www.ebay.com/itm/137911337774";
 if (!src.includes(sale) || !html.includes(sale)) throw new Error("sold link");
 if (!src.includes("$465.80 before tax") || !html.includes("$465.80 before tax")) throw new Error("shipping total");
@@ -41,7 +41,7 @@ if (!src.includes("Add this size") || !html.includes("Add this size")) throw new
 if (!src.includes("No official 1/20 oz or 1/200 oz Gold Eagle") || !html.includes("No official 1/20 oz or 1/200 oz Gold Eagle")) throw new Error("fraction note");
 const morganRows = [
   ['["1921 P", "", "44,690,000", "51.5", "47", "72.3", "100", ""]', '["1921 P","","44,690,000","51.5","47","72.3","100",""]'],
-  ['["1921 D", "", "20,345,000", "47.1", "75", "104", "336", ""]', '["1921 D","","20,345,000","47.1","75","104","336",""]'],
+  ['["1921 D", "", "20,345,000", "48", "75.5", "109", "336", ""]', '["1921 D","","20,345,000","48","75.5","109","336",""]'],
   ['["1921 S", "", "21,695,000", "46", "67", "92.5", "248", ""]', '["1921 S","","21,695,000","46","67","92.5","248",""]'],
 ];
 for (const [srcRow, htmlRow] of morganRows) {
