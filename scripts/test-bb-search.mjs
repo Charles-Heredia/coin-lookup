@@ -47,5 +47,5 @@ assert(src.includes('["1936 P", "Proof", "4,130"') && src.includes('["1942 P", "
 assert(html.includes("dimes/mercury|1936 P|Proof") && html.includes('["1936 P","Proof","4,130"'), "index missing v65 mercury proof content");
 assert(src.includes("window as any).bbSearch") && html.includes("window.bbSearch"), "search not wired");
 assert(src.includes("__bbFocus") && html.includes("__bbFocus"), "result does not open the row");
-assert(/[A-Za-z_$][A-Za-z0-9_$]{0,2}="v71"/.test(html) && src.includes('APP_VER = "v71"'), "version");
+assert(/[A-Za-z_$][A-Za-z0-9_$]{0,2}="v72"/.test(html) && src.includes('APP_VER = "v72"'), "version");
 console.log("branded search checks passed", window.bbSearch("valcambi").length, "valcambi");
