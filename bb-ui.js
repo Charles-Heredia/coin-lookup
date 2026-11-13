@@ -35,7 +35,7 @@ function bbCanonicalWeight(raw) {
 }
 function bbExtractWeight(query) {
   const phrases = ["half gram", "1/2 gram", "0.5 gram", "half g", "1/2 g", "0.5 g", "half ounce", "1/2 ounce", "0.5 ounce", "half oz", "1/2 oz", "0.5 oz", "2.5 gram", "2.5 g", "100 gram", "100 g", "100 ounce", "100 oz", "50 gram", "50 g", "25 gram", "25 g", "20 gram", "20 g", "10 gram", "10 g", "10 ounce", "10 oz", "5 kilo", "5 kg", "5 gram", "5 g", "1 kilo", "1 kg", "1 gram", "1 g", "1 ounce", "1 oz", "500 gram", "500 g", "250 gram", "250 g"];
-  let rest = bbNorm(query);
+  let rest = bbNorm(query).replace(/(\d)(g|gram|grams|oz|ounce|ounces|kg|kilo)\b/g, "$1 $2");
   for (let i = 0; i < phrases.length; i++) {
     const p = phrases[i];
     const re = new RegExp("(^| )" + p.replace(/\./g, "\\.") + "( |$)");
